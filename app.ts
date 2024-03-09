@@ -5,6 +5,7 @@ import { router as stars } from "./api/stars";
 import { router as person } from "./api/person";
 import { router as creators } from "./api/creators";
 import bodyParser from "body-parser";
+import cors from "cors";
 
 export const app = express();
 
@@ -14,6 +15,12 @@ app.use("/", index);
 app.use("/movie", movie);
 app.use("/stars", stars);
 app.use("/creators", creators);
+
+app.use(
+    cors({
+        origin: "*",
+    })
+);
 
 // app.use("/", (req, res) => {
 //   res.send("Hello World!!!");
