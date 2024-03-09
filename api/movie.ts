@@ -73,56 +73,28 @@ router.delete("/:id", (req, res) => {
 //   );
 // });
 
-router.get("/search/fields", (req, res) => {
-  const { name } = req.query;
-
-  conn.query(`
-    SELECT
-        Movie.*,
-        Stars.*,
-        Person.Type AS TypeS,
-        Creators.*,
-        PersonCreator.Type AS TypeC
-    FROM
-        Movie
-    LEFT JOIN
-        Stars ON Movie.Mid = Stars.Mid
-    LEFT JOIN
-        Creators ON Movie.Mid = Creators.Mid
-    LEFT JOIN
-        Person ON Stars.Pid_S = Person.Pid
-    LEFT JOIN
-        Person AS PersonCreator ON Creators.Pid_C = PersonCreator.Pid
-    WHERE
-        Movie.Name LIKE ?
-  `, [`%${name}%`], (err, result, fields) => {
-    if (err) {
-      console.error("Error executing SQL query:", err);
-      res.status(500).json({ error: "An error occurred while executing the SQL query." });
-      return;
-    }
-    res.json(result);
-  });
-});
-
 // router.get("/search/fields", (req, res) => {
 //   const { name } = req.query;
 
 //   conn.query(`
-//     SELECT 
-//         Movie.*, 
-//         GROUP_CONCAT(DISTINCT CONCAT(Stars.Name_S, ' (', Stars.Age_S, ' years, ', Stars.Image_S, ', ', Stars.Detail_S, ')')) AS Stars,
-//         GROUP_CONCAT(DISTINCT CONCAT(Creators.Name_C, ' (', Creators.Age_C, ' years, ', Creators.Image_C, ', ', Creators.Detail_C, ')')) AS Creators
-//     FROM 
+//     SELECT
+//         Movie.*,
+//         Stars.*,
+//         Person.Type AS TypeS,
+//         Creators.*,
+//         PersonCreator.Type AS TypeC
+//     FROM
 //         Movie
-//     LEFT JOIN 
+//     LEFT JOIN
 //         Stars ON Movie.Mid = Stars.Mid
-//     LEFT JOIN 
+//     LEFT JOIN
 //         Creators ON Movie.Mid = Creators.Mid
-//     WHERE 
+//     LEFT JOIN
+//         Person ON Stars.Pid_S = Person.Pid
+//     LEFT JOIN
+//         Person AS PersonCreator ON Creators.Pid_C = PersonCreator.Pid
+//     WHERE
 //         Movie.Name LIKE ?
-//     GROUP BY
-//         Movie.Mid
 //   `, [`%${name}%`], (err, result, fields) => {
 //     if (err) {
 //       console.error("Error executing SQL query:", err);
@@ -132,3 +104,31 @@ router.get("/search/fields", (req, res) => {
 //     res.json(result);
 //   });
 // });
+
+router.get("/search/fields", (req, res) => {
+  const { name } = req.query;
+
+  conn.query(`
+    SELECT 
+        Movie.*, 
+        GROUP_CONCAT(DISTINCT CONCAT(Stars.Name_S, ' (', Stars.Age_S, ' years, ', Stars.Image_S, ', ', Stars.Detail_S, ')')) AS Stars,
+        GROUP_CONCAT(DISTINCT CONCAT(Creators.Name_C, ' (', Creators.Age_C, ' years, ', Creators.Image_C, ', ', Creators.Detail_C, ')')) AS Creators
+    FROM 
+        Movie
+    LEFT JOIN 
+        Stars ON Movie.Mid = Stars.Mid
+    LEFT JOIN 
+        Creators ON Movie.Mid = Creators.Mid
+    WHERE 
+        Movie.Name LIKE ?
+    GROUP BY
+        Movie.Mid
+  `, [`%${name}%`], (err, result, fields) => {
+    if (err) {
+      console.error("Error executing SQL query:", err);
+      res.status(500).json({ error: "An error occurred while executing the SQL query." });
+      return;
+    }
+    res.json(result);
+  });
+});
